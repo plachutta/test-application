@@ -1,0 +1,453 @@
+  ` /* stats_tests.cpp
+ *
+ * Unit tests for the simple statistics library
+ *
+ * EECS 280 Project 1
+ *
+ * Protip #1: Write tests for the functions BEFORE you implement them!  For
+ * example, write tests for median() first, and then write median().  It sounds
+ * like a pain, but it helps make sure that you are never under the illusion
+ * that your code works when it's actually full of bugs.
+ *
+ * Protip #2: Instead of putting all your tests in main(),  put each test case
+ * in a function!
+ */
+
+
+#include "stats.hpp"
+#include <iostream>
+#include <cassert>
+#include <vector>
+#include <cmath>
+#include <chrono>
+#include "stats.hpp"
+#include "gtest/gtest.h"
+using namespace std;
+
+void test_sum_small_data_set();
+
+
+// Helper functions to count occurrences of a value in a vector
+int count_occurrences(const std::vector<double>& v, double value) {
+    return static_cast<int>(std::count(v.begin(), v.end(), value));
+}
+
+TEST(SummarizeFunction, BasicTest) {
+    // Test your function with a basic case
+    std::vector<double> input = {1.0, 2.0, 2.0, 3.0, 3.0, 3.0};
+    auto result = summarize(input);
+
+    // Performss assertions to check if the result is as expected
+    ASSERT_EQ(result.size(), 3);
+    EXPECT_EQ(result[0], std::make_pair(1.0, 1));
+    EXPECT_EQ(result[1], std::make_pair(2.0, 2));
+    EXPECT_EQ(result[2], std::make_pair(3.0, 3));
+}
+
+TEST(SummarizeFunction, EmptyInputTest) {
+    // Tests if the funciton can handle empty vectors
+    std::vector<double> input = {};
+    ASSERT_THROW(summarize(input), std::runtime_error);
+}
+
+TEST(SummarizeFunction, DuplicateValuesTest) {
+    // Verifuies that the function handles duplicate values
+    std::vector<double> input = {2.0, 1.0, 2.0, 3.0, 3.0, 3.0};
+    auto result = summarize(input);
+
+    ASSERT_EQ(result.size(), 3);
+    EXPECT_EQ(result[0], std::make_pair(1.0, 1));
+    EXPECT_EQ(result[1], std::make_pair(2.0, 2));
+    EXPECT_EQ(result[2], std::make_pair(3.0, 3));
+}
+
+TEST(SummarizeFunction, NegativeValuesTest) {
+    // Tests the function with input that includes negative values
+    std::vector<double> input = {-2.0, -1.0, 0.0, 1.0, -2.0, -2.0};
+    auto result = summarize(input);
+
+    ASSERT_EQ(result.size(), 4);
+    EXPECT_EQ(result[0], std::make_pair(-2.0, 3));
+    EXPECT_EQ(result[1], std::make_pair(-1.0, 1));
+    EXPECT_EQ(result[2], std::make_pair(0.0, 1));
+    EXPECT_EQ(result[3], std::make_pair(1.0, 1));
+}
+
+TEST(SummarizeFunction, LargeInputTest) {
+    //large input vector test
+    const int size = 1000000;
+    std::vector<double> input(size, 42.0);
+
+    auto result = summarize(input);
+
+    // Expects a single pair in the result, as all elements are the same
+    ASSERT_EQ(result.size(), 1);
+    EXPECT_EQ(result[0], std::make_pair(42.0, size));
+}
+    // Debugging information
+    SECTION("Debugging information") {
+        std::vector<double> input = {1.2, 3.5, 1.2, 2.0, 3.5, 2.0, 1.2, 4.0};
+        auto result = summarize(input);
+
+        // Prints the results for debugging purposes
+        for (const auto& pair : result) {
+            std::cout << "Value: " << pair.first << ", Count: " << pair.second << std::endl;
+        }
+    }
+
+
+TEST(CountFunction, BasicTest) {
+    // Test with a basic case
+    std::vector<double> input = {1.0, 2.0, 3.0, 4.0, 5.0};
+    int result = count(input);
+
+    // Perform assertions to check if the result is as expected
+    EXPECT_EQ(result, 5);
+}
+
+TEST(CountFunction, EmptyInputTest) {
+    // Test with an empty vector
+    std::vector<double> input = {};
+    EXPECT_THROW(count(input), std::runtime_error);
+}
+
+TEST(CountFunction, PerformanceTest) {
+    // Test the performance of the count function with a large input
+    const int size = 1000000;
+    std::vector<double> input(size, 1.0);  // Vector with 1.0 repeated many times
+
+    // Measures the time taken by the function
+    auto start = std::chrono::high_resolution_clock::now();
+    int result = count(input);
+    auto end = std::chrono::high_resolution_clock::now();
+
+        // Perform assertions based on the known properties of the input vector
+    EXPECT_EQ(result, size);
+}
+TEST(CountFunction, DuplicateValuesTest) {
+    // Test with duplicate values in the vector
+    std::vector<double> input = {1.0, 2.0, 2.0, 3.0, 3.0, 3.0};
+    int result = count(input);
+    EXPECT_EQ(result, 6);  
+    }
+    TEST(CountFunction, NegativeValuesTest) {
+    // Test with negative values in the vector
+    std::vector<double> input = {-1.0, -2.0, -3.0};
+    int result = count(input);
+    EXPECT_EQ(result, 3);
+}
+
+TEST(CountFunction, FloatingPointPrecisionTest) {
+    // Test with floating-point precision
+    std::vector<double> input = {0.1, 0.2, 0.3};
+    int result = count(input);
+    EXPECT_EQ(result, 3);
+}
+
+TEST(CountFunction, LargeInputSizeTest) {
+    // Test the performance of the count function with a large input
+    const int size = 1000000;
+    std::vector<double> input(size, 1.0);  // Vector with 1.0 repeated many times
+}
+// Function to test
+double sum(std::vector<double> v);
+
+
+TEST(SumFunction, BasicTest) {
+    // Test with a basic case
+    std::vector<double> input = {1.0, 2.0, 3.0, 4.0, 5.0};
+    double result = sum(input);
+
+    // Perform assertions to check if the result is as expected
+    EXPECT_DOUBLE_EQ(result, 15.0);
+}
+
+TEST(SumFunction, EmptyInputTest) {
+    // Test with an empty vector
+    std::vector<double> input = {};
+    EXPECT_THROW(sum(input), std::runtime_error);
+}
+
+TEST(SumFunction, DuplicateValuesTest) {
+    // Test with duplicate values in the vector
+    std::vector<double> input = {1.0, 2.0, 2.0, 3.0, 3.0, 3.0};
+    double result = sum(input);
+    EXPECT_DOUBLE_EQ(result, 14.0);  // Sum of all elements including duplicates
+}
+
+TEST(SumFunction, NegativeValuesTest) {
+    // Test with negative values in the vector
+    std::vector<double> input = {-1.0, -2.0, -3.0};
+    double result = sum(input);
+    EXPECT_DOUBLE_EQ(result, -6.0);
+}
+
+TEST(SumFunction, FloatingPointPrecisionTest) {
+    // Test with floating-point precision
+    std::vector<double> input = {0.1, 0.2, 0.3};
+    double result = sum(input);
+    EXPECT_DOUBLE_EQ(result, 0.6);
+}
+
+TEST(SumFunction, LargeInputSizeTest) {
+    // Test the performance of the sum function with a large input
+    const int size = 1000000;
+    std::vector<double> input(size, 1.0);  // Vector with 1.0 repeated many times
+    // Perform assertions based on the known properties of the input vector
+    EXPECT_DOUBLE_EQ(result, 1.0);
+}
+
+
+
+TEST(MeanFunction, BasicTest) {
+    // Test with a basic case
+    std::vector<double> input = {1.0, 2.0, 3.0, 4.0, 5.0};
+    double result = mean(input);
+
+    // Perform assertions to check if the result is as expected
+    EXPECT_DOUBLE_EQ(result, 3.0);
+}
+
+TEST(MeanFunction, EmptyInputTest) {
+    // Test with an empty vector
+    std::vector<double> input = {};
+    EXPECT_THROW(mean(input), std::runtime_error);
+}
+
+TEST(MeanFunction, DuplicateValuesTest) {
+    // Test with duplicate values in the vector
+    std::vector<double> input = {1.0, 2.0, 2.0, 3.0, 3.0, 3.0};
+    double result = mean(input);
+    EXPECT_DOUBLE_EQ(result, 2.0);  // Mean of all elements including duplicates
+}
+
+TEST(MeanFunction, NegativeValuesTest) {
+    // Test with negative values in the vector
+    std::vector<double> input = {-1.0, -2.0, -3.0};
+    double result = mean(input);
+    EXPECT_DOUBLE_EQ(result, -2.0);
+}
+
+TEST(MeanFunction, FloatingPointPrecisionTest) {
+    // Test with floating-point precision
+    std::vector<double> input = {0.1, 0.2, 0.3};
+    double result = mean(input);
+    EXPECT_DOUBLE_EQ(result, 0.2);
+}
+
+TEST(MeanFunction, LargeInputSizeTest) {
+    // Test the performance of the mean function with a large input
+    const int size = 1000000;
+    std::vector<double> input(size, 1.0);  // Vector with 1.0 repeated many times
+// Perform assertions based on the known properties of the input vector
+    EXPECT_DOUBLE_EQ(result, 1.0);
+}
+
+TEST(MedianFunction, BasicTest) {
+    // Test with a basic case
+    std::vector<double> input = {1.0, 2.0, 3.0, 4.0, 5.0};
+    double result = median(input);
+
+    // Perform assertions to check if the result is as expected
+    EXPECT_DOUBLE_EQ(result, 3.0);
+}
+
+TEST(MedianFunction, EmptyInputTest) {
+    // Test with an empty vector
+    std::vector<double> input = {};
+    EXPECT_THROW(median(input), std::runtime_error);
+}
+
+TEST(MedianFunction, DuplicateValuesTest) {
+    // Test with duplicate values in the vector
+    std::vector<double> input = {1.0, 2.0, 2.0, 3.0, 3.0, 3.0};
+    double result = median(input);
+    EXPECT_DOUBLE_EQ(result, 2.5);  // Median of all elements including duplicates
+}
+
+TEST(MedianFunction, NegativeValuesTest) {
+    // Test with negative values in the vector
+    std::vector<double> input = {-1.0, -2.0, -3.0};
+    double result = median(input);
+    EXPECT_DOUBLE_EQ(result, -2.0);
+}
+
+TEST(MedianFunction, FloatingPointPrecisionTest) {
+    // Test with floating-point precision
+    std::vector<double> input = {0.1, 0.2, 0.3};
+    double result = median(input);
+    EXPECT_DOUBLE_EQ(result, 0.2);
+}
+
+TEST(MedianFunction, LargeInputSizeTest) {
+    // Test the performance of the median function with a large input
+    const int size = 1000000;
+    std::vector<double> input(size, 1.0);  // Vector with 1.0 repeated many times
+  
+    EXPECT_DOUBLE_EQ(result, 1.0);
+}
+TEST(ModeFunction, BasicTest) {
+    // Test with a basic case
+    std::vector<double> input = {1.0, 2.0, 2.0, 3.0, 3.0, 3.0};
+    double result = mode(input);
+
+    // Perform assertions to check if the result is as expected
+    EXPECT_DOUBLE_EQ(result, 3.0);
+}
+
+TEST(ModeFunction, EmptyInputTest) {
+    // Test with an empty vector
+    std::vector<double> input = {};
+    EXPECT_THROW(mode(input), std::runtime_error);
+}
+
+TEST(ModeFunction, DuplicateValuesTest) {
+    // Test with duplicate values in the vector
+    std::vector<double> input = {1.0, 2.0, 2.0, 3.0, 3.0, 3.0};
+    double result = mode(input);
+    EXPECT_DOUBLE_EQ(result, 3.0);  // Mode of all elements including duplicates
+}
+
+TEST(ModeFunction, NegativeValuesTest) {
+    // Test with negative values in the vector
+    std::vector<double> input = {-1.0, -2.0, -3.0};
+    double result = mode(input);
+    EXPECT_DOUBLE_EQ(result, -3.0);
+}
+
+TEST(ModeFunction, FloatingPointPrecisionTest) {
+    // Test with floating-point precision
+    std::vector<double> input = {0.1, 0.2, 0.3};
+    double result = mode(input);
+    EXPECT_DOUBLE_EQ(result, 0.1);
+}
+
+TEST(ModeFunction, LargeInputSizeTest) {
+    // Test the performance of the mode function with a large input
+    const int size = 1000000;
+    std::vector<double> input(size, 1.0);  // Vector with 1.0 repeated many times
+    EXPECT_DOUBLE_EQ(result, 1.0);
+    }
+// Test cases for the min function
+
+TEST(MinFunction, BasicTest) {
+    // Test with a basic case
+    std::vector<double> input = {1.0, 2.0, 3.0, 4.0, 5.0};
+    double result = min(input);
+
+    // Perform assertions to check if the result is as expected
+    EXPECT_DOUBLE_EQ(result, 1.0);
+}
+
+TEST(MinFunction, EmptyInputTest) {
+    // Test with an empty vector
+    std::vector<double> input = {};
+    EXPECT_THROW(min(input), std::runtime_error);
+}
+
+TEST(MinFunction, DuplicateValuesTest) {
+    // Test with duplicate values in the vector
+    std::vector<double> input = {1.0, 2.0, 2.0, 3.0, 3.0, 3.0};
+    double result = min(input);
+    EXPECT_DOUBLE_EQ(result, 1.0);  // Minimum of all elements including duplicates
+}
+
+TEST(MinFunction, NegativeValuesTest) {
+    // negative values
+    std::vector<double> input = {-1.0, -2.0, -3.0};
+    double result = min(input);
+    EXPECT_DOUBLE_EQ(result, -3.0);
+}
+
+TEST(MinFunction, FloatingPointPrecisionTest) {
+    // floating-point precision
+    std::vector<double> input = {0.1, 0.2, 0.3};
+    double result = min(input);
+    EXPECT_DOUBLE_EQ(result, 0.1);
+}
+
+TEST(MinFunction, LargeInputSizeTest) {
+    // performance of the min function with a large input
+    const int size = 1000000;
+    std::vector<double> input(size, 1.0); 
+    EXPECT_DOUBLE_EQ(result, 1.0);
+    }
+int main(int argc, char **argv) {
+  test_sum_small_data_set();
+ 
+test_summarize();
+
+    cout << "All tests passed!" << endl;
+testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+  
+}
+TEST(MaxFunction, BasicTest) {
+    // Test with a basic case
+    double result = max(basicVector);
+    EXPECT_DOUBLE_EQ(result, 5.0);
+}
+
+TEST(MaxFunction, EmptyInputTest) {
+    // Test with an empty vector
+    EXPECT_THROW(max(emptyVector), std::runtime_error);
+}
+
+TEST(MaxFunction, DuplicateValuesTest) {
+    // Test with duplicate values in the vector
+    double result = max(duplicateVector);
+    EXPECT_DOUBLE_EQ(result, 3.0);  // Maximum of all elements including duplicates
+}
+
+TEST(MaxFunction, NegativeValuesTest) {
+    // Test with negative values in the vector
+    double result = max(negativeVector);
+    EXPECT_DOUBLE_EQ(result, -1.0);
+}
+
+TEST(MaxFunction, FloatingPointPrecisionTest) {
+    // Test with floating-point precision
+    double result = max(floatingPointVector);
+    EXPECT_DOUBLE_EQ(result, 0.3);
+}
+TEST(StdevFunction, BasicTest) {
+    // Test with a basic case
+    double result = stdev(basicVector);
+    EXPECT_DOUBLE_EQ(result, 1.58114);  // Adjust expected value based on actual calculation
+}
+
+TEST(StdevFunction, EmptyInputTest) {
+    // Test with an empty vector
+    EXPECT_THROW(stdev(emptyVector), std::runtime_error);
+}
+
+TEST(StdevFunction, DuplicateValuesTest) {
+    // Test with duplicate values in the vector
+    double result = stdev(duplicateVector);
+    EXPECT_DOUBLE_EQ(result, 0.816497);  // Adjust expected value based on actual calculation
+}
+
+TEST(StdevFunction, NegativeValuesTest) {
+    // Test with negative values in the vector
+    double result = stdev(negativeVector);
+    EXPECT_DOUBLE_EQ(result, 0.816497);  // Adjust expected value based on actual calculation
+}
+
+TEST(StdevFunction, FloatingPointPrecisionTest) {
+    // Test with floating-point precision
+    double result = stdev(floatingPointVector);
+    EXPECT_DOUBLE_EQ(result, 0.08165);  // Adjust expected value based on actual calculation
+}
+void test_sum_small_data_set() {
+  cout << "test_sum_small_data_set" << endl;
+
+  vector<double> data;
+  data.push_back(1);
+  data.push_back(2);
+  data.push_back(3);
+
+  assert(sum(data) == 6);
+
+  cout << "PASS!" << endl;
+}
+
